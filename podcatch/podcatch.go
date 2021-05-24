@@ -150,6 +150,7 @@ func createNFO(item Item, file string) {
   }
 }
 func markAsReceived(item Item)  {
+  os.Mkdir(".db", 0777)
   file, err := os.OpenFile(".db/complete", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
   if err != nil {
     log.Println(err)
@@ -161,6 +162,7 @@ func markAsReceived(item Item)  {
   }
 }
 func markAsErrored(item Item)  {
+  os.Mkdir(".db", 0777)
   file, err := os.OpenFile(".db/error", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
   if err != nil {
     log.Println(err)
