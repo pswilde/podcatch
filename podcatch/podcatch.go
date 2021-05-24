@@ -102,7 +102,7 @@ func downloadCasts(podcast Podcast) {
 }
 func podcastDownloaded(item Item) bool {
   if len(donefile) < 1 {
-    content, err := ioutil.ReadFile("db/complete")
+    content, err := ioutil.ReadFile(".db/complete")
     if err != nil {
       log.Fatal(err)
     }
@@ -150,7 +150,7 @@ func createNFO(item Item, file string) {
   }
 }
 func markAsReceived(item Item)  {
-  file, err := os.OpenFile("db/complete", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+  file, err := os.OpenFile(".db/complete", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
   if err != nil {
     log.Println(err)
   }
@@ -161,7 +161,7 @@ func markAsReceived(item Item)  {
   }
 }
 func markAsErrored(item Item)  {
-  file, err := os.OpenFile("db/error", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+  file, err := os.OpenFile(".db/error", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
   if err != nil {
     log.Println(err)
   }
