@@ -1,0 +1,3 @@
+Name = "Hello Internet"
+URL = "http://www.hellointernet.fm/podcast?format=rss"
+Dir = "/home/psw/podcasts/HelloInternet"
