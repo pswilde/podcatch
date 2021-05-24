@@ -2,11 +2,21 @@ package structs
 import (
   "encoding/xml"
 )
+type Settings struct {
+  Directory string
+  Limit int
+}
 type Podcast struct {
   URL string
   Name string
   Directory string
   RSS Rss
+}
+type NFO struct {
+  XMLName      xml.Name `xml:"podcast"`
+  Title       string    `xml:"title"`
+  Outline     string    `xml:"outline"`
+  Aired       string    `xml:"aired"`
 }
 type Rss struct {
    XMLName     xml.Name `xml:"rss"`
@@ -26,6 +36,7 @@ type Channel struct {
 type Item struct {
    XMLName  xml.Name `xml:"item"`
    Title       string `xml:"title"`
+   Episode     string `xml:"episode"`
    Link        string `xml:"link"`
    Description string `xml:"description"`
    PubDate     string `xml:"pubdate"`
