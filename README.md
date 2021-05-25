@@ -19,14 +19,14 @@ much easier task when organising podcasts.
 Very simple install:
 ```git clone this repo
 cd podcatch
-go build
-chmod +x ./podcatch
-./podcatch
+chmod +x install.sh
+./install.sh
+podcatch
 ```
 
 ### Setup
 Settings and Podcasts lists are automatically created in the  `~/.podcatch/` directory.
-These files are in the TOML format, and the "podcasts.toml" file uses a `map[string]Podcast` interface.  
+These files are in the TOML format, and the `podcasts.toml` file uses a `map[string]Podcast` interface.  
 The automatically created files contain some example podcasts from which you should be able to understand the
 required layout.
 
