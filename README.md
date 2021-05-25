@@ -18,7 +18,6 @@ much easier task when organising podcasts.
 ### Install
 Very simple install:
 ```
-cd podcatch
 chmod +x install.sh
 ./install.sh
 podcatch
