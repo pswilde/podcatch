@@ -1,6 +1,6 @@
 package main
 import (
-  "podcatch/podcatch"
+  "podCatch/podcatch"
 )
 func main(){
   podcatch.Start()

@@ -1,9 +1,10 @@
- package podcatch
+package podcatch
 import (
   "fmt"
-  . "podcatch/structs"
+  . "podCatch/structs"
   "github.com/pelletier/go-toml"
   "encoding/xml"
+  "io"
   "io/ioutil"
   "net/http"
   "regexp"
@@ -15,13 +16,40 @@ var Version string = "0.1"
 var Settings Settings
 var Podcasts map[string]Podcast = make(map[string]Podcast)
 var donefile string
+var podcatchdir string
+var homedir string
+var dbdir string
 func Start(){
   fmt.Printf("Starting PodCatch Version : %s...\r\n", Version )
+  getHomeDirs()
   getSettings()
   getPodcasts()
 }
+func getHomeDirs(){
+  h, err := os.UserHomeDir()
+  if err != nil {
+    log.Fatal( err )
+  }
+  homedir = h
+  podcatchdir = h + "/.podcatch/"
+}
 func getSettings(){
-  content, err := ioutil.ReadFile("settings.toml")
+  settings := podcatchdir + "settings.toml"
+  if !checkFileExists(settings){
+    pwd, err := os.Getwd()
+    if err != nil {
+      log.Fatal(err)
+    }
+    fmt.Println("Copying default settings.toml to user dir.")
+    ok, err := copyFile(pwd + "/defaults/settings.toml",settings)
+    if err != nil {
+      log.Fatal(err)
+    }
+    if ok > 0 {
+      fmt.Println("Copied.")
+    }
+  }
+  content, err := ioutil.ReadFile(settings)
   if err != nil {
     log.Fatal(err)
   }
@@ -29,6 +57,10 @@ func getSettings(){
   if e != nil {
     log.Fatal(err)
   }
+  Settings.Directory = strings.Replace(Settings.Directory,"~",homedir,1)
+  dbdir = Settings.Directory + ".db/"
+  os.Mkdir(dbdir,0755)
+
 }
 func getPodcasts(){
   if len(Podcasts) == 0 {
@@ -42,7 +74,22 @@ func getPodcasts(){
   }
 }
 func getPodcastFiles() {
-  content, err := ioutil.ReadFile("podcasts.toml")
+  pcs := podcatchdir + "podcasts.toml"
+  if !checkFileExists(pcs){
+    pwd, err := os.Getwd()
+    if err != nil {
+      log.Fatal(err)
+    }
+    fmt.Println("Copying default podcasts.toml to user dir.")
+    ok, err := copyFile(pwd + "/defaults/podcasts.toml",pcs)
+    if err != nil {
+      log.Fatal(err)
+    }
+    if ok > 0 {
+      fmt.Println("Copied.")
+    }
+  }
+  content, err := ioutil.ReadFile(podcatchdir + "podcasts.toml")
   if err != nil {
     log.Fatal(err)
   }
@@ -101,18 +148,21 @@ func downloadCasts(podcast Podcast) {
   }
 }
 func podcastDownloaded(item Item) bool {
-  if len(donefile) < 1 {
-    content, err := ioutil.ReadFile(".db/complete")
-    if err != nil {
-      log.Fatal(err)
+  db := dbdir + "complete"
+  if checkCreate(db) {
+    if len(donefile) < 1 {
+      content, err := ioutil.ReadFile(db)
+      if err != nil {
+        log.Fatal(err)
+      }
+      donefile = string(content)
     }
-    donefile = string(content)
-  }
-  if strings.Contains(donefile,item.Title){
-    return true
-  }
-  if strings.Contains(donefile,item.Media.URL){
-    return true
+    if strings.Contains(donefile,item.Title){
+      return true
+    }
+    if strings.Contains(donefile,item.Media.URL){
+      return true
+    }
   }
   return false
 }
@@ -150,8 +200,9 @@ func createNFO(item Item, file string) {
   }
 }
 func markAsReceived(item Item)  {
-  os.Mkdir(".db", 0777)
-  file, err := os.OpenFile(".db/complete", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+  db := dbdir + "complete"
+  checkCreate(db)
+  file, err := os.OpenFile(db, os.O_APPEND|os.O_WRONLY, 0755)
   if err != nil {
     log.Println(err)
   }
@@ -162,8 +213,9 @@ func markAsReceived(item Item)  {
   }
 }
 func markAsErrored(item Item)  {
-  os.Mkdir(".db", 0777)
-  file, err := os.OpenFile(".db/error", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+  db := dbdir + "error"
+  checkCreate(db)
+  file, err := os.OpenFile(db, os.O_APPEND|os.O_WRONLY, 0755)
   if err != nil {
     log.Println(err)
   }
@@ -172,4 +224,61 @@ func markAsErrored(item Item)  {
   if _, err := file.WriteString(content); err != nil {
     log.Fatal(err)
   }
+}
+func checkFileExists(file string) bool {
+  if _, err := os.Stat(file); err == nil {
+    // fmt.Println("Exists")
+    // exists
+    return true
+  } else if os.IsNotExist(err) {
+      // fmt.Println("Not Exists")
+    // not exists
+    return false
+  } else {
+    // fmt.Println("Maybe Exists, Maybe Not")
+    return false
+  // Schrodinger: file may or may not exist. See err for details.
+  // Therefore, do *NOT* use !os.IsNotExist(err) to test for file existence
+  }
+  return false
+}
+func checkCreate(file string) bool {
+  if checkFileExists(file) {
+    return true
+  } else {
+    if createFile(file) {
+      return true
+    }
+  }
+  return false
+}
+func createFile(file string) bool {
+  f, err := os.Create(file)
+  if err != nil {
+    log.Fatal(err)
+    return false
+  }
+  defer f.Close()
+  return true
+}
+func copyFile(src, dst string) (int64, error) {
+  sourceFileStat, err := os.Stat(src)
+  if err != nil {
+    return 0, err
+  }
+  if !sourceFileStat.Mode().IsRegular() {
+    return 0, fmt.Errorf("%s is not a regular file", src)
+  }
+  source, err := os.Open(src)
+  if err != nil {
+    return 0, err
+  }
+  defer source.Close()
+  destination, err := os.Create(dst)
+  if err != nil {
+    return 0, err
+  }
+  defer destination.Close()
+  nBytes, err := io.Copy(destination, source)
+  return nBytes, err
 }

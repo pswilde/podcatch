@@ -1,0 +1,8 @@
+
+[HelloInternet]
+  Name = "Hello Internet"
+  URL = "http://www.hellointernet.fm/podcast?format=rss"
+
+[NSTAAF]
+  Name = "No Such Thing as a Fish"
+  URL = "https://audioboom.com/channels/2399216.rss"
