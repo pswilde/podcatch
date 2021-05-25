@@ -1,7 +1,7 @@
 package podcatch
 import (
   "fmt"
-  . "podCatch/structs"
+  . "podcatch/structs"
   "github.com/pelletier/go-toml"
   "encoding/xml"
   "io"

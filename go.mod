@@ -1,4 +1,4 @@
-module podCatch
+module podcatch
 
 go 1.16
 

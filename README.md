@@ -20,8 +20,8 @@ Very simple install:
 ```git clone this repo
 cd podcatch
 go build
-chmod +x ./podCatch
-./podCatch
+chmod +x ./podcatch
+./podcatch
 ```
 
 ### Setup
