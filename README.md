@@ -17,7 +17,7 @@ much easier task when organising podcasts.
 
 ### Install
 Very simple install:
-```git clone this repo
+```
 cd podcatch
 chmod +x install.sh
 ./install.sh
