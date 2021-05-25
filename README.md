@@ -19,4 +19,20 @@ much easier task when organising podcasts.
 Very simple install:
 ```git clone this repo
 cd podcatch
-go build -o podcatch-bin
+go build
+chmod +x ./podCatch
+./podCatch
+```
+
+### Setup
+Settings and Podcasts lists are automatically created in the  `~/.podcatch/` directory.
+These files are in the TOML format, and the "podcasts.toml" file uses a `map[string]Podcast` interface.  
+The automatically created files contain some example podcasts from which you should be able to understand the
+required layout.
+
+### Future plans
+I'd really like to work on consuming more of the RSS data (i.e. description) and store alongside the MP3
+with the hopes that Jellyfin can parse that to supply episode overviews and more data about it.  
+I have tried working with this a little by creating an NFO file, but this has not worked as yet.
+
+## Thanks for reading!
