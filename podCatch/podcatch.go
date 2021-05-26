@@ -189,7 +189,6 @@ func downloadMp3(url string, file string) bool {
 }
 func addId3(artist string, item Item, file string) {
   fmt.Printf("Saving ID3 to %s\r\n",file)
-  fmt.Printf("%v\r\n",item)
   mp3File, err := id3.Open(file)
   if err != nil {
     log.Fatal(err)
