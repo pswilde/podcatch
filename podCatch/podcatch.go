@@ -230,7 +230,7 @@ func markAsErrored(item Item)  {
     log.Println(err)
   }
   defer file.Close()
-  content := fmt.Sprintf("%s\r\n%s",item.Title, item.Media.URL)
+  content := fmt.Sprintf("%s\r\n%s\r\n",item.Title, item.Media.URL)
   if _, err := file.WriteString(content); err != nil {
     log.Fatal(err)
   }
