@@ -12,12 +12,6 @@ type Podcast struct {
   Directory string
   RSS Rss
 }
-type NFO struct {
-  XMLName      xml.Name `xml:"podcast"`
-  Title       string    `xml:"title"`
-  Outline     string    `xml:"outline"`
-  Aired       string    `xml:"aired"`
-}
 type Rss struct {
    XMLName     xml.Name `xml:"rss"`
    Version     string   `xml:"version,attr"`

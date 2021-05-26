@@ -11,6 +11,8 @@ import (
   "os"
   "log"
   "strings"
+  id3 "github.com/mikkyang/id3-go"
+  v2 "github.com/mikkyang/id3-go/v2"
 )
 var Version string = "0.1"
 var Settings Settings
@@ -137,6 +139,7 @@ func downloadCasts(podcast Podcast) {
       ok := downloadMp3(item.Media.URL, dir + "/" + filename)
       if ok {
         // createNFO(item, strings.Replace(dir + "/" + filename,".mp3",".nfo",1))
+        addId3(podcast.Name, item,dir + "/" + filename)
         markAsReceived(item)
       } else {
         markAsErrored(item)
@@ -184,19 +187,27 @@ func downloadMp3(url string, file string) bool {
   ok = true
   return ok
 }
-func createNFO(item Item, file string) {
-  fmt.Printf("Saving NFO file %s",file)
-  var nfo NFO
-  nfo.Title = item.Title
-  nfo.Outline = item.Description
-  nfo.Aired = item.PubDate
-  data, err := xml.Marshal(nfo)
+func addId3(artist string, item Item, file string) {
+  fmt.Printf("Saving ID3 to %s\r\n",file)
+  fmt.Printf("%v\r\n",item)
+  mp3File, err := id3.Open(file)
   if err != nil {
     log.Fatal(err)
   }
-  err = ioutil.WriteFile(file, data, 0775)
-  if err != nil {
-    log.Fatal(err)
+  defer mp3File.Close()
+  if mp3File.Artist() == "" {
+    mp3File.SetArtist(artist)
+  }
+  if mp3File.Album() == "" {
+    mp3File.SetAlbum(artist)
+  }
+  if mp3File.Title() == "" {
+    mp3File.SetTitle(item.Title)
+  }
+  if len(mp3File.Comments()) == 0 {
+    ft := v2.V23FrameTypeMap["COMM"]
+    textFrame := v2.NewTextFrame(ft, item.Description)
+    mp3File.AddFrames(textFrame)
   }
 }
 func markAsReceived(item Item)  {
