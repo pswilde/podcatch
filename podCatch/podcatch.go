@@ -14,7 +14,7 @@ import (
   id3 "github.com/mikkyang/id3-go"
   v2 "github.com/mikkyang/id3-go/v2"
 )
-var Version string = "0.1"
+var Version string = "0.4"
 var Settings Settings
 var Podcasts map[string]Podcast = make(map[string]Podcast)
 var donefile string
