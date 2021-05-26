@@ -4,7 +4,7 @@ import (
   . "podcatch/structs"
   "github.com/pelletier/go-toml"
   "encoding/xml"
-  "io"
+  // "io"
   "io/ioutil"
   "net/http"
   "regexp"
@@ -38,16 +38,9 @@ func getHomeDirs(){
 func getSettings(){
   settings := podcatchdir + "settings.toml"
   if !checkFileExists(settings){
-    pwd, err := os.Getwd()
-    if err != nil {
-      log.Fatal(err)
-    }
-    fmt.Println("Copying default settings.toml to user dir.")
-    ok, err := copyFile(pwd + "/defaults/settings.toml",settings)
-    if err != nil {
-      log.Fatal(err)
-    }
-    if ok > 0 {
+    fmt.Println("Creating default settings.toml in user dir.")
+    ok := createDefaultFile("settings",settings)
+    if ok {
       fmt.Println("Copied.")
     }
   }
@@ -78,17 +71,12 @@ func getPodcasts(){
 func getPodcastFiles() {
   pcs := podcatchdir + "podcasts.toml"
   if !checkFileExists(pcs){
-    pwd, err := os.Getwd()
-    if err != nil {
-      log.Fatal(err)
-    }
-    fmt.Println("Copying default podcasts.toml to user dir.")
-    ok, err := copyFile(pwd + "/defaults/podcasts.toml",pcs)
-    if err != nil {
-      log.Fatal(err)
-    }
-    if ok > 0 {
+    fmt.Println("Creating default podcasts.toml in user dir.")
+    ok := createDefaultFile("podcasts",pcs)
+    if ok {
       fmt.Println("Copied.")
+      fmt.Println("Please Edit the ~/.podcatch/*.toml files as required and run again")
+       os.Exit(0)
     }
   }
   content, err := ioutil.ReadFile(podcatchdir + "podcasts.toml")
@@ -271,24 +259,22 @@ func createFile(file string) bool {
   defer f.Close()
   return true
 }
-func copyFile(src, dst string) (int64, error) {
-  sourceFileStat, err := os.Stat(src)
+func createDefaultFile(template string, file string) bool {
+  if !checkFileExists(file) {
+    createFile(file)
+  }
+  var data []byte
+  switch template {
+	case "podcasts":
+    data = []byte(DefaultPodcasts)
+	case "settings":
+		data = []byte(DefaultSettings)
+	default:
+		fmt.Printf("Unknown : %s.\n", template)
+	}
+  err := ioutil.WriteFile(file, data, 0775)
   if err != nil {
-    return 0, err
+    log.Fatal(err)
   }
-  if !sourceFileStat.Mode().IsRegular() {
-    return 0, fmt.Errorf("%s is not a regular file", src)
-  }
-  source, err := os.Open(src)
-  if err != nil {
-    return 0, err
-  }
-  defer source.Close()
-  destination, err := os.Create(dst)
-  if err != nil {
-    return 0, err
-  }
-  defer destination.Close()
-  nBytes, err := io.Copy(destination, source)
-  return nBytes, err
+  return true
 }

@@ -6,6 +6,19 @@ type Settings struct {
   Directory string
   Limit int
 }
+var DefaultSettings string = `
+  Directory = "~/podcasts/"
+  Limit = 10
+`
+var DefaultPodcasts string = `
+[HelloInternet]
+  Name = "Hello Internet"
+  URL = "http://www.hellointernet.fm/podcast?format=rss"
+
+[NSTAAF]
+  Name = "No Such Thing as a Fish"
+  URL = "https://audioboom.com/channels/2399216.rss"
+`
 type Podcast struct {
   URL string
   Name string
