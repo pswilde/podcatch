@@ -1,6 +1,6 @@
 # PodCatch - a simple Podcast downloader
 
-PodCatch is a _very_ simple Podcast downloader written in GoLand built to help me download podcasts
+PodCatch is a _very_ simple Podcast downloader written in GoLang built to help me download podcasts
 and store them in my media directory so [Jellyfin](https://jellyfin.org/) can
 index them and thus can be listened to using Jellyfin's various apps.  
 Due to how PodCatch is configurable, I'm sure it would have other uses too.
