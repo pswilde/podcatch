@@ -15,7 +15,7 @@ import (
   v2 "github.com/mikkyang/id3-go/v2"
 )
 var Version string = "0.4"
-var Settings Settings
+var mySettings Settings = Settings{}
 var Podcasts map[string]Podcast = make(map[string]Podcast)
 var donefile string
 var podcatchdir string
@@ -48,12 +48,12 @@ func getSettings(){
   if err != nil {
     log.Fatal(err)
   }
-  e := toml.Unmarshal(content,&Settings)
+  e := toml.Unmarshal(content,&mySettings)
   if e != nil {
     log.Fatal(err)
   }
-  Settings.Directory = strings.Replace(Settings.Directory,"~",homedir,1)
-  dbdir = Settings.Directory + ".db/"
+  mySettings.Directory = strings.Replace(mySettings.Directory,"~",homedir,1)
+  dbdir = mySettings.Directory + ".db/"
   os.Mkdir(dbdir,0755)
 
 }
@@ -112,14 +112,14 @@ func parseRSS(podcast Podcast, rssxml []byte) Rss {
 func downloadCasts(podcast Podcast) {
   count := 0
   for _,item := range podcast.RSS.Channel.Items {
-    if count >= Settings.Limit {
+    if count >= mySettings.Limit {
       break
     }
     if !podcastDownloaded(item){
       fmt.Printf("Downloading '%s %s' from : %s.\r\n", item.Episode, item.Title, item.Media.URL)
       re := regexp.MustCompile(`[^0-9a-zA-Z-_]+`)
       filename := item.Episode + re.ReplaceAllString(item.Title,"_") + ".mp3"
-      dir := Settings.Directory + podcast.Directory
+      dir := mySettings.Directory + podcast.Directory
       err := os.Mkdir(dir, 0777)
       if err != nil && err.Error() != fmt.Sprintf("mkdir %s: file exists",dir){
         log.Fatal(err)
